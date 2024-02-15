@@ -2,6 +2,7 @@ import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyWebsocketEventV2 } from "aws-lambda";
 import { generateLambdaProxyResponse } from "../utils/utils";
 import { getDocClient } from "../utils/get-doc-client";
+import * as uuid from "uuid";
 
 const docClient = getDocClient();
 
@@ -16,7 +17,8 @@ export async function connectionHandler(
     new PutCommand({
       TableName: process.env.DYNAMODB_TABLE!,
       Item: {
-        connectionId,
+        id: connectionId,
+        v4Id: uuid.v4(),
         ttl: oneHourFromNow,
       },
     })

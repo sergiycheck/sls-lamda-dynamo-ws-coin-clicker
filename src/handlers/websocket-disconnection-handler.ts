@@ -12,7 +12,7 @@ export async function disconnectionHandler(event: APIGatewayEvent) {
     new DeleteCommand({
       TableName: process.env.DYNAMODB_TABLE!,
       Key: {
-        connectionId,
+        id: connectionId,
       },
     })
   );

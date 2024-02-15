@@ -1,6 +1,8 @@
 org: sergiycheck
-service: ws-click-dynamodb
+app: ws-coin-click
+service: ws-coin-click-dynamodb
 frameworkVersion: "3"
+configValidationMode: error
 
 plugins:
   - serverless-plugin-typescript
@@ -14,7 +16,7 @@ provider:
 
   environment:
     DYNAMODB_TABLE: ${self:service}-${sls:stage}
-  http:
+  httpApi:
     cors: true
   iam:
     role:
