@@ -1,0 +1,26 @@
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { APIGatewayProxyWebsocketEventV2 } from "aws-lambda";
+import { generateLambdaProxyResponse } from "../utils/utils";
+import { getDocClient } from "../utils/get-doc-client";
+
+const docClient = getDocClient();
+
+export async function connectionHandler(
+  event: APIGatewayProxyWebsocketEventV2
+): Promise<any> {
+  const { connectionId } = event.requestContext;
+
+  const oneHourFromNow = Math.round(Date.now() / 1000 + 3600);
+
+  await docClient.send(
+    new PutCommand({
+      TableName: process.env.DYNAMODB_TABLE!,
+      Item: {
+        connectionId,
+        ttl: oneHourFromNow,
+      },
+    })
+  );
+
+  return generateLambdaProxyResponse(200, "Connected");
+}

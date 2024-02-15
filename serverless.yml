@@ -8,14 +8,13 @@ plugins:
 provider:
   name: aws
   runtime: nodejs18.x
-
   websocketsApiName: custom-websockets-api-name
   websocketsApiRouteSelectionExpression: $request.body.action
   websocketsDescription: Custom Serverless Websockets
 
   environment:
     DYNAMODB_TABLE: ${self:service}-${sls:stage}
-  httpApi:
+  http:
     cors: true
   iam:
     role:
@@ -36,13 +35,19 @@ functions:
     events:
       - websocket:
           route: $connect
+
+  disconnectionHandler:
+    handler: handler.disconnectionHandler
+    events:
       - websocket:
           route: $disconnect
 
   defaultHandler:
     handler: handler.defaultHandler
     events:
-      - websocket: $default
+      - websocket:
+          route: $default
+          routeResponseSelectionExpression: $default
 
   increaseCounterHandler:
     handler: handler.increaseCounterHandler
