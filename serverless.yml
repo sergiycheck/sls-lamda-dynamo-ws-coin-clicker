@@ -57,6 +57,12 @@ functions:
       - websocket:
           route: increaseCounterHandler
 
+  getUserHandler:
+    handler: handler.getUserHandler
+    events:
+      - websocket:
+          route: getUserHandler
+
 resources:
   Resources:
     TodosDynamoDbTable:

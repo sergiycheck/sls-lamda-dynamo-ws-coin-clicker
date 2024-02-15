@@ -20,6 +20,7 @@ export async function connectionHandler(
         id: connectionId,
         v4Id: uuid.v4(),
         ttl: oneHourFromNow,
+        coinCounter: 100_000,
       },
     })
   );

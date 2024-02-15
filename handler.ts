@@ -3,6 +3,7 @@ import { connectionHandler as connectionHandlerImplementation } from "./src/hand
 import { increaseCounterHandler as increaseCounterHandlerImplementation } from "./src/handlers/increase-counter-handler";
 import { eventLoggerWrapper } from "./src/utils/event-logger-wrapper";
 import { disconnectionHandler as disconnectionHandlerImplementation } from "./src/handlers/websocket-disconnection-handler";
+import { getUser as getUserImplementation } from "./src/handlers/get-user-handler";
 
 export const defaultHandler = eventLoggerWrapper(defaultHandlerImplementation);
 
@@ -13,6 +14,8 @@ export const connectionHandler = eventLoggerWrapper(
 export const disconnectionHandler = eventLoggerWrapper(
   disconnectionHandlerImplementation
 );
+
+export const getUserHandler = eventLoggerWrapper(getUserImplementation);
 
 export const increaseCounterHandler = eventLoggerWrapper(
   increaseCounterHandlerImplementation

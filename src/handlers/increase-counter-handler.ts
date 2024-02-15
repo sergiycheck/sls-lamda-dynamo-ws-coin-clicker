@@ -2,6 +2,7 @@ import { APIGatewayProxyWebsocketEventV2 } from "aws-lambda";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { generateLambdaProxyResponse } from "../utils/utils";
 import { getDocClient } from "../utils/get-doc-client";
+import { sendMessageToClient } from "../utils/send-message-to-client";
 
 const docClient = getDocClient();
 
@@ -11,18 +12,18 @@ export async function increaseCounterHandler(
   const { eventType, connectionId } = event.requestContext;
 
   //increase counter by value
-  const { incrementValue, userName } = JSON.parse(event.body) as {
+  const { incrementValue, id } = JSON.parse(event.body) as {
     action: string;
-    userName: string;
+    id: string;
     incrementValue: number;
   };
 
   const updateCommand = new UpdateCommand({
     TableName: process.env.DYNAMODB_TABLE!,
     Key: {
-      userName,
+      id,
     },
-    UpdateExpression: "SET #coint_counter = #coint_counter + :val",
+    UpdateExpression: "SET coinCounter = coinCounter + :val",
     ExpressionAttributeValues: {
       ":val": incrementValue,
     },
@@ -30,6 +31,8 @@ export async function increaseCounterHandler(
   });
 
   const response = await docClient.send(updateCommand);
+
+  await sendMessageToClient(event, JSON.stringify(response.Attributes));
 
   return generateLambdaProxyResponse(200, JSON.stringify(response.Attributes));
 }
