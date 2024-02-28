@@ -6,21 +6,17 @@ import * as uuid from "uuid";
 
 const docClient = getDocClient();
 
-export async function connectionHandler(
-  event: APIGatewayProxyWebsocketEventV2
-): Promise<any> {
+export async function connectionHandler(event: APIGatewayProxyWebsocketEventV2): Promise<any> {
   const { connectionId } = event.requestContext;
 
   const oneHourFromNow = Math.round(Date.now() / 1000 + 3600);
 
   await docClient.send(
     new PutCommand({
-      TableName: process.env.DYNAMODB_TABLE!,
+      TableName: process.env.USERS_CONNECTIONS_TABLE!,
       Item: {
         id: connectionId,
-        v4Id: uuid.v4(),
         ttl: oneHourFromNow,
-        coinCounter: 100_000,
       },
     })
   );

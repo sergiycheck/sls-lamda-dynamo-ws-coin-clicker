@@ -10,7 +10,7 @@ export const getUser = async (event: APIGatewayProxyWebsocketEventV2) => {
   const { id } = JSON.parse(event.body);
 
   const command = new GetCommand({
-    TableName: process.env.DYNAMODB_TABLE!,
+    TableName: process.env.USERS_TABLE!,
     Key: {
       id,
     },

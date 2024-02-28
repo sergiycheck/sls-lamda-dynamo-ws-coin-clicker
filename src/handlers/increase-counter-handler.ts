@@ -6,11 +6,7 @@ import { sendMessageToClient } from "../utils/send-message-to-client";
 
 const docClient = getDocClient();
 
-export async function increaseCounterHandler(
-  event: APIGatewayProxyWebsocketEventV2
-): Promise<any> {
-  const { eventType, connectionId } = event.requestContext;
-
+export async function increaseCounterHandler(event: APIGatewayProxyWebsocketEventV2): Promise<any> {
   //increase counter by value
   const { incrementValue, id } = JSON.parse(event.body) as {
     action: string;
@@ -19,7 +15,7 @@ export async function increaseCounterHandler(
   };
 
   const updateCommand = new UpdateCommand({
-    TableName: process.env.DYNAMODB_TABLE!,
+    TableName: process.env.USERS_TABLE!,
     Key: {
       id,
     },

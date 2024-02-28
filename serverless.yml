@@ -15,7 +15,8 @@ provider:
   websocketsDescription: Custom Serverless Websockets
 
   environment:
-    DYNAMODB_TABLE: ${self:service}-${sls:stage}
+    USERS_CONNECTIONS_TABLE: ${self:service}-${sls:stage}-users-connections
+    USERS_TABLE: ${self:service}-${sls:stage}-users
   httpApi:
     cors: true
   iam:
@@ -29,7 +30,17 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
-          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.USERS_CONNECTIONS_TABLE}"
+
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.USERS_TABLE}"
 
 functions:
   connectionHandler:
@@ -63,9 +74,15 @@ functions:
       - websocket:
           route: getUserHandler
 
+  createUserHandler:
+    handler: handler.createUserHandler
+    events:
+      - websocket:
+          route: createUserHandler
+
 resources:
   Resources:
-    TodosDynamoDbTable:
+    UsersConnectionsTable:
       Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
@@ -76,4 +93,17 @@ resources:
           - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        TableName: ${self:provider.environment.USERS_CONNECTIONS_TABLE}
+
+    UsersTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.USERS_TABLE}
