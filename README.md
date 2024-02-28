@@ -3,24 +3,23 @@
 Get user handler
 
 ```json
-{ "action": "getUserHandler", "body": "{ \"userName\": \"userName1\" }" }
+{ "action": "getUserHandler", "userName": "userName1" }
 ```
 
 Create user handler
 
 ```json
-{
-  "action": "createUserHandler",
-  "body": "{ \"userName\": \"userName1\" }"
-}
+{ "action": "createUserHandler", "userName": "userName1" }
 ```
 
 Increment user handler
 
 ```json
-{
-  "action": "increaseCounterHandler",
-  "id": "e4986bf9-40d5-4d6b-ae1b-986d32350bae",
-  "incrementValue": 20
-}
+{ "action": "increaseCounterHandler", "id": "e7cec2cd-e555-4d2f-8368-e9ea6cabe667", "incrementValue": 20 }
+```
+
+Connect with wscat
+
+```bash
+wscat -c wss://6ri9wdx49c.execute-api.us-east-1.amazonaws.com/dev
 ```

@@ -5,9 +5,11 @@ import { getUserServiceInstance } from "../services/user.service";
 
 export const getUserByUserName = async (event: APIGatewayProxyWebsocketEventV2) => {
   const { connectionId } = event.requestContext;
-  const { userName } = JSON.parse(event.body);
 
-  console.log("userName", userName);
+  const { userName } = JSON.parse(event.body) as {
+    action: string;
+    userName: string;
+  };
 
   const userServiceInstance = getUserServiceInstance();
   const userQueryItems = await userServiceInstance.scanUsersByUserName(userName);

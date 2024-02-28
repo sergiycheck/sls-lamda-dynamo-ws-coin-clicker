@@ -4,7 +4,11 @@ import { sendMessageToClient } from "../utils/send-message-to-client";
 import { generateLambdaProxyResponse } from "../utils/utils";
 
 export const createUser = async (event: APIGatewayProxyWebsocketEventV2) => {
-  const { userName } = JSON.parse(event.body);
+  const { userName } = JSON.parse(event.body) as {
+    action: string;
+    userName: string;
+  };
+
   const { connectionId } = event.requestContext;
 
   const userServiceInstance = getUserServiceInstance();
