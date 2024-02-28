@@ -13,7 +13,12 @@ export async function increaseCounterHandler(event: APIGatewayProxyWebsocketEven
 
   const response = await getUserServiceInstance().updateUserCoinCounter({ id, incrementValue });
 
-  await sendMessageToClient(event, JSON.stringify(response.Attributes));
+  const jsonResponse = JSON.stringify({
+    action: "increaseCounter",
+    counter: response.Attributes,
+  });
 
-  return generateLambdaProxyResponse(200, JSON.stringify(response.Attributes));
+  await sendMessageToClient(event, jsonResponse);
+
+  return generateLambdaProxyResponse(200, jsonResponse);
 }

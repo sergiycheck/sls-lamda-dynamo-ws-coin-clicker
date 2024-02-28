@@ -25,7 +25,12 @@ export const getUserByUserName = async (event: APIGatewayProxyWebsocketEventV2) 
     await userServiceInstance.setConnectionId(userId, connectionId);
   }
 
-  await sendMessageToClient(event, JSON.stringify(user));
+  const jsonResponse = JSON.stringify({
+    action: "getUserByUserName",
+    user,
+  });
 
-  return generateLambdaProxyResponse(200, JSON.stringify(user));
+  await sendMessageToClient(event, jsonResponse);
+
+  return generateLambdaProxyResponse(200, jsonResponse);
 };
