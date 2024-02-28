@@ -3,6 +3,7 @@ import { APIGatewayEvent } from "aws-lambda";
 import { generateLambdaProxyResponse } from "../utils/utils";
 import { getDocClient } from "../utils/get-doc-client";
 import { QueryCommand } from "@aws-sdk/client-dynamodb";
+import { getUserServiceInstance } from "../services/user.service";
 
 const docClient = getDocClient();
 
@@ -18,32 +19,15 @@ export async function disconnectionHandler(event: APIGatewayEvent) {
     })
   );
 
-  const queryUserByConnectionId = await docClient.send(
-    new QueryCommand({
-      TableName: process.env.USERS_TABLE!,
-      ExpressionAttributeValues: {
-        ":connId": { S: connectionId },
-      },
-      KeyConditionExpression: "connectionId = :connId",
-      ConsistentRead: true,
-    })
-  );
+  const userServiceInstance = getUserServiceInstance();
+  const queryUserByConnectionIdItems = await userServiceInstance.queryUsersByConnectionId(connectionId);
 
-  const user = queryUserByConnectionId.Items?.[0];
-  const { id } = user;
+  if (queryUserByConnectionIdItems.length) {
+    const user = queryUserByConnectionIdItems[0];
+    const id = user.id.S;
 
-  await docClient.send(
-    new UpdateCommand({
-      TableName: process.env.USERS_TABLE!,
-      Key: {
-        id,
-      },
-      UpdateExpression: "SET connectionId = :null_val",
-      ExpressionAttributeValues: {
-        ":null_val": { NULL: true },
-      },
-    })
-  );
+    await userServiceInstance.setConnectionIdToNull(id);
+  }
 
   return generateLambdaProxyResponse(200, "Disconnected");
 }

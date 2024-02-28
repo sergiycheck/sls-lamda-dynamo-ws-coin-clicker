@@ -3,6 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { generateLambdaProxyResponse } from "../utils/utils";
 import { getDocClient } from "../utils/get-doc-client";
 import { sendMessageToClient } from "../utils/send-message-to-client";
+import { getUserServiceInstance } from "../services/user.service";
 
 const docClient = getDocClient();
 
@@ -14,19 +15,7 @@ export async function increaseCounterHandler(event: APIGatewayProxyWebsocketEven
     incrementValue: number;
   };
 
-  const updateCommand = new UpdateCommand({
-    TableName: process.env.USERS_TABLE!,
-    Key: {
-      id,
-    },
-    UpdateExpression: "SET coinCounter = coinCounter + :val",
-    ExpressionAttributeValues: {
-      ":val": incrementValue,
-    },
-    ReturnValues: "UPDATED_NEW",
-  });
-
-  const response = await docClient.send(updateCommand);
+  const response = await getUserServiceInstance().updateUserCoinCounter({ id, incrementValue });
 
   await sendMessageToClient(event, JSON.stringify(response.Attributes));
 
