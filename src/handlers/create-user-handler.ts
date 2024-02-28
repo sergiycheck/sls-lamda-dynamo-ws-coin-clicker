@@ -15,7 +15,7 @@ export const createUser = async (event: APIGatewayProxyWebsocketEventV2) => {
 
   const user = await userServiceInstance.getUserById(userId);
 
-  await sendMessageToClient(event, JSON.stringify(user.Item));
+  await sendMessageToClient(event, JSON.stringify(user));
 
-  return generateLambdaProxyResponse(200, JSON.stringify(user.Item));
+  return generateLambdaProxyResponse(200, JSON.stringify(user));
 };

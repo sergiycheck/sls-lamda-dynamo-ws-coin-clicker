@@ -3,7 +3,7 @@
 Get user handler
 
 ```json
-{ "action": "getUserHandler" }
+{ "action": "getUserHandler", "body": "{ \"userName\": \"userName1\" }" }
 ```
 
 Create user handler
@@ -11,7 +11,7 @@ Create user handler
 ```json
 {
   "action": "createUserHandler",
-  "body": "{\"name\": \"user1\"}"
+  "body": "{ \"userName\": \"userName1\" }"
 }
 ```
 

@@ -89,6 +89,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -105,8 +106,7 @@ resources:
 
           - AttributeName: connectionId
             AttributeType: S
-          - AttributeName: userName
-            AttributeType: S
+
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -115,13 +115,6 @@ resources:
           - IndexName: ConnectionIdIdIndex
             KeySchema:
               - AttributeName: connectionId
-                KeyType: HASH
-            Projection:
-              ProjectionType: "KEYS_ONLY"
-
-          - IndexName: UserNameIndex
-            KeySchema:
-              - AttributeName: userName
                 KeyType: HASH
             Projection:
               ProjectionType: "KEYS_ONLY"

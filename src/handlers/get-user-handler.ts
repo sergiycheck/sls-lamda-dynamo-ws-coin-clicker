@@ -7,15 +7,23 @@ export const getUserByUserName = async (event: APIGatewayProxyWebsocketEventV2) 
   const { connectionId } = event.requestContext;
   const { userName } = JSON.parse(event.body);
 
+  console.log("userName", userName);
+
   const userServiceInstance = getUserServiceInstance();
-  const userQueryItems = await userServiceInstance.queryUsersByUserName(userName);
+  const userQueryItems = await userServiceInstance.scanUsersByUserName(userName);
+  if (!userQueryItems.length) {
+    return generateLambdaProxyResponse(404, "User not found");
+  }
+
   const userId = userQueryItems[0].id.S;
 
-  await userServiceInstance.setConnectionId(userId, connectionId);
+  const user = await userServiceInstance.getUserById(userId);
 
-  const response = await userServiceInstance.getUserById(userId);
+  if (user.connectionId === "null") {
+    await userServiceInstance.setConnectionId(userId, connectionId);
+  }
 
-  await sendMessageToClient(event, JSON.stringify(response.Item));
+  await sendMessageToClient(event, JSON.stringify(user));
 
-  return generateLambdaProxyResponse(200, JSON.stringify(response.Item));
+  return generateLambdaProxyResponse(200, JSON.stringify(user));
 };

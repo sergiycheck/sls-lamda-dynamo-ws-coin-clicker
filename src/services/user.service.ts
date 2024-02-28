@@ -1,11 +1,23 @@
 import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { getDocClient } from "../utils/get-doc-client";
 import * as uuid from "uuid";
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
+import { QueryCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
 
 type UserQueryReturned = {
   id: { S: string };
   connectionId: { S: string };
+};
+
+type ScanUsersByUserNameReturned = UserQueryReturned & {
+  userName: { S: string };
+  coinCounter: { N: string };
+};
+
+type User = {
+  id: string;
+  userName: string;
+  connectionId: string; // ipv4Address | null
+  coinCounter: number;
 };
 
 class UserService {
@@ -38,7 +50,8 @@ class UserService {
       ConsistentRead: true,
     });
 
-    return this.docClient.send(command);
+    const response = await this.docClient.send(command);
+    return response.Item as User;
   }
 
   public async updateUserCoinCounter({ id, incrementValue }: { id: string; incrementValue: number }) {
@@ -74,21 +87,19 @@ class UserService {
     return queryUserByConnectionId.Items as UserQueryReturned[];
   }
 
-  public async queryUsersByUserName(userName: string) {
+  public async scanUsersByUserName(userName: string) {
     const queryUserByUserName = await this.docClient.send(
-      new QueryCommand({
+      new ScanCommand({
         TableName: process.env.USERS_TABLE!,
-        IndexName: "UserNameIndex",
         ExpressionAttributeValues: {
           ":userName": { S: userName },
         },
-        KeyConditionExpression: "userName = :userName",
-        ProjectionExpression: "connectionId, id",
-        ScanIndexForward: false,
+        FilterExpression: "userName = :userName",
+        ProjectionExpression: "connectionId, id, userName, coinCounter",
       })
     );
 
-    return queryUserByUserName.Items as UserQueryReturned[];
+    return queryUserByUserName.Items as ScanUsersByUserNameReturned[];
   }
 
   public async setConnectionId(id: string, connectionId: string) {
