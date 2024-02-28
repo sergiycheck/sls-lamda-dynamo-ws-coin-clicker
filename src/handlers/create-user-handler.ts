@@ -4,11 +4,11 @@ import { sendMessageToClient } from "../utils/send-message-to-client";
 import { generateLambdaProxyResponse } from "../utils/utils";
 
 export const createUser = async (event: APIGatewayProxyWebsocketEventV2) => {
-  const { name } = JSON.parse(event.body);
+  const { userName } = JSON.parse(event.body);
   const { connectionId } = event.requestContext;
 
   const userServiceInstance = getUserServiceInstance();
-  await userServiceInstance.createUser({ name, connectionId });
+  await userServiceInstance.createUser({ userName, connectionId });
 
   const userQueryItems = await userServiceInstance.queryUsersByConnectionId(connectionId);
   const userId = userQueryItems[0].id.S;

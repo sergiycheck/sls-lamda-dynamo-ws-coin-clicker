@@ -1,8 +1,7 @@
-import { DeleteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayEvent } from "aws-lambda";
 import { generateLambdaProxyResponse } from "../utils/utils";
 import { getDocClient } from "../utils/get-doc-client";
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
 import { getUserServiceInstance } from "../services/user.service";
 
 const docClient = getDocClient();
@@ -26,7 +25,7 @@ export async function disconnectionHandler(event: APIGatewayEvent) {
     const user = queryUserByConnectionIdItems[0];
     const id = user.id.S;
 
-    await userServiceInstance.setConnectionIdToNull(id);
+    await userServiceInstance.setConnectionId(id, "null");
   }
 
   return generateLambdaProxyResponse(200, "Disconnected");

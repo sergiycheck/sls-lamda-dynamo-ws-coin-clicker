@@ -1,16 +1,19 @@
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
-import { getDocClient } from "../utils/get-doc-client";
 import { APIGatewayProxyWebsocketEventV2 } from "aws-lambda";
 import { sendMessageToClient } from "../utils/send-message-to-client";
 import { generateLambdaProxyResponse } from "../utils/utils";
 import { getUserServiceInstance } from "../services/user.service";
 
-const docClient = getDocClient();
+export const getUserByUserName = async (event: APIGatewayProxyWebsocketEventV2) => {
+  const { connectionId } = event.requestContext;
+  const { userName } = JSON.parse(event.body);
 
-export const getUser = async (event: APIGatewayProxyWebsocketEventV2) => {
-  const { id } = JSON.parse(event.body);
+  const userServiceInstance = getUserServiceInstance();
+  const userQueryItems = await userServiceInstance.queryUsersByUserName(userName);
+  const userId = userQueryItems[0].id.S;
 
-  const response = await getUserServiceInstance().getUserById(id);
+  await userServiceInstance.setConnectionId(userId, connectionId);
+
+  const response = await userServiceInstance.getUserById(userId);
 
   await sendMessageToClient(event, JSON.stringify(response.Item));
 

@@ -3,6 +3,11 @@ import { getDocClient } from "../utils/get-doc-client";
 import * as uuid from "uuid";
 import { QueryCommand } from "@aws-sdk/client-dynamodb";
 
+type UserQueryReturned = {
+  id: { S: string };
+  connectionId: { S: string };
+};
+
 class UserService {
   docClient: DynamoDBDocumentClient;
 
@@ -10,12 +15,12 @@ class UserService {
     this.docClient = docClient;
   }
 
-  public async createUser({ name, connectionId }: { name: string; connectionId: string }) {
+  public async createUser({ userName, connectionId }: { userName: string; connectionId: string }) {
     const command = new PutCommand({
       TableName: process.env.USERS_TABLE!,
       Item: {
         id: uuid.v4(),
-        name,
+        userName,
         connectionId,
         coinCounter: 1000_000_000,
       },
@@ -53,11 +58,6 @@ class UserService {
   }
 
   public async queryUsersByConnectionId(connectionId: string) {
-    type UserQueryReturned = {
-      id: { S: string };
-      connectionId: { S: string };
-    };
-
     const queryUserByConnectionId = await this.docClient.send(
       new QueryCommand({
         TableName: process.env.USERS_TABLE!,
@@ -74,7 +74,24 @@ class UserService {
     return queryUserByConnectionId.Items as UserQueryReturned[];
   }
 
-  public async setConnectionIdToNull(id: string) {
+  public async queryUsersByUserName(userName: string) {
+    const queryUserByUserName = await this.docClient.send(
+      new QueryCommand({
+        TableName: process.env.USERS_TABLE!,
+        IndexName: "UserNameIndex",
+        ExpressionAttributeValues: {
+          ":userName": { S: userName },
+        },
+        KeyConditionExpression: "userName = :userName",
+        ProjectionExpression: "connectionId, id",
+        ScanIndexForward: false,
+      })
+    );
+
+    return queryUserByUserName.Items as UserQueryReturned[];
+  }
+
+  public async setConnectionId(id: string, connectionId: string) {
     return this.docClient.send(
       new UpdateCommand({
         TableName: process.env.USERS_TABLE!,
@@ -83,7 +100,7 @@ class UserService {
         },
         UpdateExpression: "SET connectionId = :empty_val",
         ExpressionAttributeValues: {
-          ":empty_val": "null",
+          ":empty_val": connectionId,
         },
       })
     );

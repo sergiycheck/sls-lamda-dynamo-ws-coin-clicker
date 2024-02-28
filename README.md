@@ -3,7 +3,7 @@
 Get user handler
 
 ```json
-{ "action": "getUserHandler", "id": "a6672561-e491-4a76-948a-fa7c7d405c0a" }
+{ "action": "getUserHandler" }
 ```
 
 Create user handler
@@ -20,7 +20,7 @@ Increment user handler
 ```json
 {
   "action": "increaseCounterHandler",
-  "id": "a6672561-e491-4a76-948a-fa7c7d405c0a",
+  "id": "e4986bf9-40d5-4d6b-ae1b-986d32350bae",
   "incrementValue": 20
 }
 ```
