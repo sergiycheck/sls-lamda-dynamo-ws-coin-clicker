@@ -1,5 +1,11 @@
 ### Actions
 
+Get non existing user
+
+```json
+{ "action": "getUserHandler", "userName": "userName2" }
+```
+
 Get user handler
 
 ```json
@@ -9,7 +15,7 @@ Get user handler
 Create user handler
 
 ```json
-{ "action": "createUserHandler", "userName": "userName1" }
+{ "action": "createUserHandler", "userName": "userName2" }
 ```
 
 Increment user handler
